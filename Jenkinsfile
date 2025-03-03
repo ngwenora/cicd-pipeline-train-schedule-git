@@ -50,12 +50,7 @@ pipeline {
                 input message: 'Approve deployment to production?'
             }
         }
-        stage('Deploy to Production') {
-            when {
-                expression {
-                    currentBuild.result == 'SUCCESS'
-                }
-            }
+        stage('Deploy to Production') { 
             steps {
                 script {
                     withKubeConfig(credentialsId: 'eks-login', namespace: 'production') {
