@@ -1,5 +1,5 @@
 pipeline {
-    agent change-me
+    agent any
     stages {
         stage('Build') {
             steps {
@@ -28,7 +28,6 @@ pipeline {
                         sh 'docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"'
                     }
                     sh 'echo "Docker login complete. Attempting to push..."'
-
                     sh "docker tag ${imageName} docker.io/${imageName}:${env.BUILD_NUMBER}"
                     sh "docker images"
                     sh "docker push docker.io/${imageName}:${env.BUILD_NUMBER}"
@@ -39,10 +38,9 @@ pipeline {
         stage('Deploy to Staging') {
             steps {
                 script {
-                    def imageName = "ngwe093/pocpub:${env.BUILD_NUMBER}"
                     withKubeConfig(credentialsId: 'eks-login', namespace: 'staging') {
-                        sh "kubectl set image deployment/poc-staging poc-staging=${imageName}"
-                        sh "kubectl rollout restart deployment/your-deployment-name"
+                        sh "kubectl apply -f deployments/service.yaml"
+                        sh "kubectl apply -f deployments/staging-deployment.yaml"
                     }
                 }
             }
@@ -60,10 +58,9 @@ pipeline {
             }
             steps {
                 script {
-                    def imageName = "ngwe093/pocpub:${env.BUILD_NUMBER}"
                     withKubeConfig(credentialsId: 'eks-login', namespace: 'production') {
-                        sh "kubectl set image deployment/poc-production poc-production=${imageName}"
-                        sh "kubectl rollout restart deployment/your-deployment-name"
+                        sh "kubectl apply -f deployments/service.yaml"
+                        sh "kubectl apply -f deployments/production-deployment.yaml"
                     }
                 }
             }
