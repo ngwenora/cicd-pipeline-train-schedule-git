@@ -28,9 +28,11 @@ pipeline {
                         sh 'docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"'
                     }
                     sh 'echo "Docker login complete. Attempting to push..."'
+
+                    sh "docker tag ${imageName} docker.io/${imageName}:${env.BUILD_NUMBER}"
+                    sh "docker images"
                     sh "docker push docker.io/${imageName}:${env.BUILD_NUMBER}"
                     sh "docker push docker.io/${imageName}:latest"
-
                 }
             }
         }
