@@ -22,7 +22,12 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    def imageName = "ngwe093/pocpub"
+                    def imageName = "ngwe093/poc"
+                    sh 'echo "Attempting explicit docker login..."'
+                    withCredentials([usernamePassword(credentialsId: 'docker_login', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"'
+                    }
+                    sh 'echo "Docker login complete. Attempting to push..."'
                     docker.withRegistry('https://docker.io', 'docker_login') {
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
