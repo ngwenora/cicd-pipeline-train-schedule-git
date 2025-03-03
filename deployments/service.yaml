@@ -15,13 +15,17 @@
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app: train-schedule
+    k8s-app: train-schedule
   name: train-schedule-loadbalancer
   namespace: staging
 spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
   type: LoadBalancer
   selector:
     app: train-schedule
-  ports:
-  - protocol: TCP
-    port: 8080
-    targetPort: 8080 
