@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: train-schedule-deployment
+  namespace: staging
+  labels:
+    app: train-schedule
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: train-schedule
+  template:
+    metadata:
+      labels:
+        app: train-schedule
+    spec:
+      containers:
+      - name: train-schedule
+        image: ngwe093/pocpub:latest # Use latest tag
+        ports:
+        - containerPort: 8080
