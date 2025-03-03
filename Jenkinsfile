@@ -41,6 +41,7 @@ pipeline {
                     withKubeConfig(credentialsId: 'eks-login', namespace: 'staging') {
                         sh "kubectl apply -f deployments/service.yaml"
                         sh "kubectl apply -f deployments/staging-deployment.yaml"
+                        sh "kubectl rollout restart deployment/train-schedule-deployment -n staging"
                     }
                 }
             }
@@ -56,6 +57,7 @@ pipeline {
                     withKubeConfig(credentialsId: 'eks-login', namespace: 'production') {
                         sh "kubectl apply -f deployments/prod-service.yaml"
                         sh "kubectl apply -f deployments/production-deployment.yaml"
+                        sh "kubectl rollout restart deployment/train-schedule-deployment -n production"
                     }
                 }
             }
