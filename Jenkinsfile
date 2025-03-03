@@ -28,10 +28,9 @@ pipeline {
                         sh 'docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"'
                     }
                     sh 'echo "Docker login complete. Attempting to push..."'
-                    docker.withRegistry('https://docker.io', 'docker_login') {
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
-                    }
+                    sh "docker push docker.io/${imageName}:${env.BUILD_NUMBER}"
+                    sh "docker push docker.io/${imageName}:latest"
+
                 }
             }
         }
