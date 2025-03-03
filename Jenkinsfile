@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script {
                     withKubeConfig(credentialsId: 'eks-login', namespace: 'production') {
-                        sh "kubectl apply -f deployments/service.yaml"
+                        sh "kubectl apply -f deployments/prod-service.yaml"
                         sh "kubectl apply -f deployments/production-deployment.yaml"
                     }
                 }
