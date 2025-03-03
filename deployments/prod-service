@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: train-schedule-service-production
+spec:
+  type: NodePort
+  selector:
+    app: train-schedule
+  ports:
+  - protocol: TCP
+    port: 8080
+    nodePort: 30280
