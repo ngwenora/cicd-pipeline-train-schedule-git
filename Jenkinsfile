@@ -36,23 +36,34 @@ pipeline {
                 }
             }
         }
-        stage('DeployToProduction') {
+        stage('Deploy to Staging') {
+            steps {
+                script {
+                    def imageName = "ngwe093/pocpub:${env.BUILD_NUMBER}"
+                    withKubeConfig(credentialsId: 'eks-login', namespace: 'staging') {
+                        sh "kubectl set image deployment/poc-staging poc-staging=${imageName}"
+                        sh "kubectl rollout restart deployment/your-deployment-name"
+                    }
+                }
+            }
+        }
+        stage('Approval to Deploy to Production') {
+            steps {
+                input message: 'Approve deployment to production?'
+            }
+        }
+        stage('Deploy to Production') {
             when {
-                branch 'master'
+                expression {
+                    currentBuild.result == 'SUCCESS'
+                }
             }
             steps {
-                input 'Deploy to Production?'
-                milestone(1)
-                withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
-                    script {
-                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull ngwe093/pocpub:${env.BUILD_NUMBER}\""
-                        try {
-                            sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker stop train-schedule\""
-                            sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker rm train-schedule\""
-                        } catch (err) {
-                            echo: 'caught error: $err'
-                        }
-                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker run --restart always --name train-schedule -p 8080:8080 -d ngwe093/pocpub:${env.BUILD_NUMBER}\""
+                script {
+                    def imageName = "ngwe093/pocpub:${env.BUILD_NUMBER}"
+                    withKubeConfig(credentialsId: 'eks-login', namespace: 'production') {
+                        sh "kubectl set image deployment/poc-production poc-production=${imageName}"
+                        sh "kubectl rollout restart deployment/your-deployment-name"
                     }
                 }
             }
