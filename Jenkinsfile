@@ -11,7 +11,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    app = docker.build("ngwe093/pocpub")
+                    def imageName = "ngwe093/poc"
+                    app = docker.build(imageName)
                     app.inside {
                         sh 'echo $(curl localhost:8080)'
                     }
@@ -21,6 +22,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
+                    def imageName = "ngwe093/poc"
                     docker.withRegistry('https://docker.io', 'docker_login') {
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
