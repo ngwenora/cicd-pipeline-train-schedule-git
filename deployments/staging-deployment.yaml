@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: train-schedule
-        image: ngwe093/pocpub:latest # Use latest tag
+        image: ngwe093/pocpub:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 8081
